@@ -1,4 +1,3 @@
-@@ -1,7 +1,11 @@
 FROM php:8.2-apache
 FROM php:8.2-cli
 
