@@ -1,4 +1,3 @@
-@@ -1,31 +1,10 @@
 <?php
 	// You need to fill in this data from your own mySQL server
 	
