@@ -1,7 +1,10 @@
 FROM php:8.2-apache
 
-# Fix: ensure only one MPM is loaded (mpm_prefork is required for mod_php)
-RUN a2dismod mpm_event mpm_worker || true && a2enmod mpm_prefork
+# Fix MPM conflict: remove ALL MPM symlinks, then re-add only mpm_prefork
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+          /etc/apache2/mods-enabled/mpm_*.conf \
+    && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/ \
+    && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/
 
 # Enable Apache modules needed for PHP
 RUN a2enmod rewrite
@@ -20,8 +23,6 @@ RUN chown -R www-data:www-data /var/www/html
 # Create .htaccess for clean URLs (optional)
 RUN echo "RewriteEngine On" > /var/www/html/.htaccess
 
-# Expose port 80 (Apache default - Railway will map this)
 EXPOSE 80
 
-# Start Apache in foreground
 CMD ["apache2-foreground"]
