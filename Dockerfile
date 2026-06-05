@@ -1,5 +1,8 @@
 FROM php:8.2-apache
 
+# Fix: ensure only one MPM is loaded (mpm_prefork is required for mod_php)
+RUN a2dismod mpm_event mpm_worker || true && a2enmod mpm_prefork
+
 # Enable Apache modules needed for PHP
 RUN a2enmod rewrite
 RUN a2enmod headers
