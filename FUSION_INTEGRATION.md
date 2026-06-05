@@ -9,13 +9,15 @@ This guide shows how to integrate the BPgranny score server with **Clickteam Fus
 In your Clickteam Fusion game, create these **Edit Box** objects:
 
 ```
-Edit Box "Script URL"      → Value: http://yourserver.com/score_script.php
+Edit Box "Script URL"      → Value: https://bpgranny-production.up.railway.app/score_script.php
 Edit Box "Game ID"         → Value: 1 (or unique ID per game)
 Edit Box "Player Name"     → Value: (player enters name)
 Edit Box "Player Score"    → Value: (score value)
 Edit Box "Key"             → Value: dragonfruit42 (KEEP SECRET - hide offscreen!)
 Edit Box "MD5 Hash"        → Value: (displays calculated hash)
 ```
+
+**Note:** Use the public domain `https://bpgranny-production.up.railway.app` for your Clickteam Fusion game (external/player-facing).
 
 ### Step 2: Calculate MD5 Hash
 
@@ -141,32 +143,24 @@ if (!hash_equals($expected_hash, $_GET["code"])) {
 
 ### 1. Test Server Connection
 
-**Event:** On button click:
+Open in your web browser or test in Clickteam Fusion:
 
 ```
-Start Download (GET) with Live Receiver:
-   URL: http://yourserver.com/score_script.php?status=1
+https://bpgranny-production.up.railway.app/score_script.php?status=1
 ```
 
 **Expected Response:** `online`
 
 ### 2. Test Score Submission
 
-Set values manually:
-- Game ID: `1`
-- Player Name: `TestPlayer`
-- Score: `1000`
-- Key: `dragonfruit42`
-
-Calculate MD5 and submit. Watch for:
-- No errors returned
-- Score appears in retrieval
-
-### 3. Test Score Retrieval
-
-Request just the game ID:
+Using a browser (replace values):
 ```
-URL: http://yourserver.com/score_script.php?gameid=1
+https://bpgranny-production.up.railway.app/score_script.php?gameid=1&playername=TestPlayer&score=1000&code=HASH
+```
+
+To calculate HASH for testing:
+```
+MD5(1 + TestPlayer + 1000 + dragonfruit42) = 8e8b3c3c7b3c5c5c5c5c5c5c5c5c5c5c
 ```
 
 **Expected Response:**
@@ -174,17 +168,54 @@ URL: http://yourserver.com/score_script.php?gameid=1
 TestPlayer|1000|Jun 05 2026|
 ```
 
+### 3. Test Score Retrieval
+
+```
+https://bpgranny-production.up.railway.app/score_script.php?gameid=1
+```
+
+**Expected Response:**
+```
+TestPlayer|1000|Jun 05 2026|
+```
+
+## 🌐 Railway Domains Explained
+
+### Public Domain (Use in Clickteam Fusion)
+```
+https://bpgranny-production.up.railway.app
+```
+- Accessible from internet (your players' computers)
+- Use HTTPS for security
+- Default port 443 (HTTPS)
+- This is what players connect to
+
+### Private Domain (Internal Only)
+```
+http://bpgranny.railway.internal
+```
+- Only accessible within Railway's internal network
+- Used for container-to-container communication
+- Don't expose this publicly
+- Not needed for your Clickteam Fusion setup
+
 ## 🐛 Troubleshooting
+
+### Connection Refused / 404 Not Found
+- **Check URL:** Use `https://` not `http://`
+- **Check domain:** `bpgranny-production.up.railway.app` (not internal)
+- **Port:** The app automatically runs on port 443 (HTTPS)
 
 ### "ERROR: Invalid security code"
 - Verify `Edit Box Key` matches `SECRET_KEY` in `config.php`
 - Check MD5 hash calculation matches: GameID + PlayerName + Score + Key
 - Ensure URL encoding is applied to all parameters
+- MD5 is case-sensitive - use lowercase
 
 ### No scores returned
 - Confirm `Game ID` matches when submitting AND retrieving
 - Check that score submission returned no errors first
-- Verify database connection (test with `?status=1`)
+- Verify server is online with status check: `?status=1`
 
 ### URL Encoding Issues
 - Always use `urlEncode$()` on user input (player name, game ID)
@@ -192,10 +223,10 @@ TestPlayer|1000|Jun 05 2026|
 - Use LIJI URL Encoder object as shown in examples
 
 ### Connection timeout
-- Check server URL is correct and accessible
-- Verify database credentials in `.env` file
-- Ensure MySQL server on Railway is running
-- Test with simple `?status=1` first
+- Check your internet connection
+- Verify Railway app is deployed and running
+- Try the status check first: `?status=1`
+- Check Railway dashboard for app errors
 
 ## 📝 Multi-Game Setup
 
@@ -215,7 +246,7 @@ Each game has its own leaderboard. Scores don't mix!
 ```
 Do NOT show to players:
 - "Key" Edit Box (store in global string or offscreen)
-- "Script URL" (hide offscreen)
+- "Script URL" (hide offscreen or use constant)
 - "MD5 Hash" (debug feature only)
 
 Show only to players:
@@ -231,10 +262,18 @@ Show only to players:
 - Re-enable buttons only after download completes
 
 ### Security Best Practices
-- Use HTTPS in production (not HTTP)
-- Change `SECRET_KEY` from default `dragonfruit42`
+- Use HTTPS in production (Railway provides this automatically)
+- Change `SECRET_KEY` from default `dragonfruit42` before going live
 - Keep the key consistent between game clients and server
-- If you suspect hack attempts, change the key (all submissions must use new key)
+- If you suspect hack attempts, change the key and redeploy
+
+### Change Secret Key
+
+1. Edit `.env` file in Railway dashboard
+2. Update `SECRET_KEY=your_new_key_here`
+3. Railway auto-redeploys (takes ~1-2 minutes)
+4. All new submissions must use the new key
+5. Old scores remain valid (stored in database)
 
 ## 📚 Reference
 
@@ -242,6 +281,7 @@ Show only to players:
 
 **Submit Score:**
 ```
+https://bpgranny-production.up.railway.app/score_script.php
 ?gameid=123
 &playername=PlayerName
 &score=1000
@@ -250,11 +290,13 @@ Show only to players:
 
 **Retrieve Scores:**
 ```
+https://bpgranny-production.up.railway.app/score_script.php
 ?gameid=123
 ```
 
 **Check Status:**
 ```
+https://bpgranny-production.up.railway.app/score_script.php
 ?status=1
 ```
 
@@ -297,22 +339,39 @@ Event 5: Display leaderboard to player using String Tokenizer
 ## 💡 Common Modifications
 
 ### Change Score Limit
-Edit `config.php`:
-```php
-$score_number = 5;  // Show top 5 instead of 10
+Edit `.env` in Railway dashboard:
 ```
+SCORE_NUMBER=5
+```
+(Show top 5 instead of 10)
 
 ### Change Date Format
-In `score_script.php`, modify:
+Edit `config.php` and redeploy:
 ```php
 $date = date('M d Y');  // Change to any PHP date format
 ```
 
 ### Custom Delimiter
-Modify both:
-1. In `score_script.php`: `echo "|"`
-2. In Clickteam Fusion: String Tokenizer delimiter parameter
+Would require modifying the server code (not recommended for now).
+
+## 🔧 Railway Configuration Reference
+
+Your app is configured with:
+```
+Database (MySQL): railway MySQL database
+Environment Variables (.env):
+  DB_HOST=mysql.railway.internal
+  DB_USER=root
+  DB_PASS=(set in Railway)
+  DB_NAME=railway
+  DB_PORT=3306
+  SECRET_KEY=dragonfruit42
+  TABLE_NAME=scores
+  SCORE_NUMBER=10
+
+Public URL: https://bpgranny-production.up.railway.app
+```
 
 ---
 
-**Questions?** Check the main README.md for API details and troubleshooting.
+**Questions?** Check the main README.md for additional API details and troubleshooting.
