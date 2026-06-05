@@ -24,5 +24,4 @@ RUN chown -R www-data:www-data /var/www/html
 RUN echo "RewriteEngine On" > /var/www/html/.htaccess
 
 EXPOSE 80
-
-CMD ["apache2-foreground"]
+CMD ["bash", "-c", "rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/ && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/ && apache2-foreground"]
