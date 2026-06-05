@@ -1,39 +1,28 @@
 <?php
-	// You need to fill in this data from your own mySQL server
-	
-	// Your host -- for example localhost or mysql.server.com
-	$host = 'shortline.proxy.rlwy.net';
-	
-	// Your user name for mySQL
-	$user = 'root';
-	
-	// Your password for mySQL
-    $pass = 'zJECPcanVgwbtvlERXEmrtXbqgcKjXhB';
-	
-	// Your database name for mySQL
-	$dbname= 'railway';
+/**
+ * Database Configuration
+ * WARNING: Move this to environment variables in production
+ */
 
-	// ATTENTION
-	// This is your secret key - Needs to be the same as the secret key in your game
-	// You can change this but remember to change it in your game.
-	// This is used to help secure the score and produce MD5 hashes
-    $secret_key = "dragonfruit42";
-	
-	// Your table name for mySQL
-	// You can change this is you wish
-	$tname= 'scores';
-	
-	// Number of scores to save for each gameid
-	// Feel free to change this but the example file only lists 10 scores
-	// You would need to code this
-	$score_number = '10';
-	
-$host = 'mysql.railway.internal';
-$user = 'root';
-$pass = 'zJECPcanVgwbtvlERXEmrtXbqgcKjXhB';
-$dbname = 'railway';
-$port = 3306;
-$secret_key = "dragonfruit42";
-$tname = 'scores';
-$score_number = '10';
+// Get config from environment variables or use defaults
+$host = getenv('DB_HOST') ?: 'mysql.railway.internal';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') ?: '';
+$dbname = getenv('DB_NAME') ?: 'railway';
+$port = (int)(getenv('DB_PORT') ?: 3306);
+
+// Secret key for MD5 hashing (should match game client)
+$secret_key = getenv('SECRET_KEY') ?: 'dragonfruit42';
+
+// Database table name
+$tname = getenv('TABLE_NAME') ?: 'scores';
+
+// Number of scores to display
+$score_number = (int)(getenv('SCORE_NUMBER') ?: 10);
+
+// Database connection options
+$db_options = array(
+    mysqli_init(),
+    MYSQLI_OPT_CONNECT_TIMEOUT => 5,
+);
 ?>
