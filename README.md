@@ -132,6 +132,25 @@ GET /score_script.php?gameid=123
 }
 ```
 
+## What's New
+
+### New Files Added
+- **`save_session.php`** — Accepts a full game session via HTTP POST and stores it in the database, including per-trial stimulus, reaction time, and hit data
+- **`export.php`** — Password-protected endpoint that downloads all session and trial data as a CSV file for analysis
+- **`healthcheck.php`** — Confirms the server and database are connected
+
+### New Environment Variable
+- `EXPORT_PASSWORD` — Set this in Railway Variables to protect the CSV export endpoint
+
+### New Database Tables
+- **`game_sessions`** — Stores level, score, mistakes, shots fired, and play time per session
+- **`game_trials`** — Stores per-trial stimulus, reaction time, and hit, linked to a session
+
+### Export Your Data
+Visit: https://bpgranny-production.up.railway.app/export.php?password=YOUR_EXPORT_PASSWORD
+
+Downloads a CSV with one row per trial across all recorded sessions.
+
 ## Security Notes
 
 ⚠️ **IMPORTANT:**
