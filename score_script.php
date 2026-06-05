@@ -7,15 +7,25 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require(dirname(__FILE__) . "/config.php");
-
-// Determine response format (default to pipe-delimited for Clickteam Fusion compatibility)
+// Handle status check BEFORE loading config (in case DB is down)
 $format = isset($_GET["format"]) ? strtolower($_GET["format"]) : "pipe";
 if ($format === "json") {
     header('Content-Type: application/json; charset=utf-8');
 } else {
     header('Content-Type: text/plain; charset=utf-8');
 }
+
+if (isset($_GET["status"])) {
+    if ($format === "json") {
+        echo json_encode(['status' => 'online']);
+    } else {
+        echo "online";
+    }
+    exit(0);
+}
+
+// Now load config for database operations
+require(dirname(__FILE__) . "/config.php");
 
 /**
  * Create database connection with error handling
@@ -61,17 +71,6 @@ function initialize_table($db, $tname) {
 // Initialize database connection
 $db = get_db_connection($host, $user, $pass, $dbname, $port);
 initialize_table($db, $tname);
-
-// Handle status check endpoint
-if (isset($_GET["status"])) {
-    if ($format === "json") {
-        echo json_encode(['status' => 'online']);
-    } else {
-        echo "online";
-    }
-    mysqli_close($db);
-    exit(0);
-}
 
 // Validate and sanitize gameid
 if (!isset($_GET["gameid"])) {
