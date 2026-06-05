@@ -1,24 +1,24 @@
-FROM php:8.2-fpm
+FROM php:8.2-apache
+
+# Enable Apache modules needed for PHP
+RUN a2enmod rewrite
+RUN a2enmod headers
 
 # Install mysqli extension
 RUN docker-php-ext-install mysqli
 
-# Install composer for dependency management (optional)
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
 # Copy application files
-COPY . /app
-WORKDIR /app
+COPY . /var/www/html/
+WORKDIR /var/www/html
 
-# Create user for running PHP (security best practice)
-RUN groupadd -r www && useradd -r -g www www
-USER www
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html
 
-# Expose port for PHP-FPM
-EXPOSE 9000
+# Create .htaccess for clean URLs (optional)
+RUN echo "RewriteEngine On" > /var/www/html/.htaccess
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD php -r "mysqli_connect('${DB_HOST}', '${DB_USER}', '${DB_PASS}', '${DB_NAME}', ${DB_PORT}) or exit(1);"
+# Expose port 80 (Apache default - Railway will map this)
+EXPOSE 80
 
-CMD ["php-fpm"]
+# Start Apache in foreground
+CMD ["apache2-foreground"]
