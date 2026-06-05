@@ -1,11 +1,5 @@
 FROM php:8.2-apache
 
-# Fix MPM conflict: remove ALL MPM symlinks, then re-add only mpm_prefork
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
-          /etc/apache2/mods-enabled/mpm_*.conf \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/ \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/
-
 # Enable Apache modules needed for PHP
 RUN a2enmod rewrite
 RUN a2enmod headers
@@ -24,4 +18,6 @@ RUN chown -R www-data:www-data /var/www/html
 RUN echo "RewriteEngine On" > /var/www/html/.htaccess
 
 EXPOSE 80
-CMD ["bash", "-c", "rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/ && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/ && apache2-foreground"]
+
+# Use Railway's PORT variable so Apache listens on the right port
+CMD ["bash", "-c", "sed -i \"s/Listen 80/Listen ${PORT:-80}/\" /etc/apache2/ports.conf && sed -i \"s/*:80/*:${PORT:-80}/g\" /etc/apache2/sites-enabled/000-default.conf && apache2-foreground"]
