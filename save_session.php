@@ -49,11 +49,10 @@ function init_tables($db) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 }
 
-// Accept POST only
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'POST required']);
-    exit(1);
+$input = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET;
+$raw = file_get_contents('php://input');
+if (!empty($raw)) {
+    $input = array_merge($input, json_decode($raw, true) ?? []);
 }
 
 // Read input — support both form POST and JSON body
@@ -95,11 +94,23 @@ if (!hash_equals($expected, $code)) {
 }
 
 // Parse trials — expect JSON array: [{"stimulus":"...","reaction_time":0.1,"hit":1}, ...]
+// Accept either JSON trials array OR individual t0_s / t0_r / t0_h params
 $trials = [];
 if (!empty($input['trials'])) {
     $decoded = is_array($input['trials']) ? $input['trials'] : json_decode($input['trials'], true);
     if (is_array($decoded)) {
         $trials = $decoded;
+    }
+} else {
+    // Build trials from individual URL params: t0_s, t0_r, t0_h, t1_s, t1_r, t1_h ...
+    $i = 0;
+    while (isset($input["t{$i}_s"]) || isset($input["t{$i}_r"]) || isset($input["t{$i}_h"])) {
+        $trials[] = [
+            'stimulus'      => $input["t{$i}_s"] ?? '',
+            'reaction_time' => $input["t{$i}_r"] ?? 0,
+            'hit'           => $input["t{$i}_h"] ?? 0
+        ];
+        $i++;
     }
 }
 
