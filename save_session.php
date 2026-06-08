@@ -49,10 +49,14 @@ function init_tables($db) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 }
 
-$input = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET;
+// Accept parameters from GET, POST, or JSON body
+$input = array_merge($_GET, $_POST);
 $raw = file_get_contents('php://input');
 if (!empty($raw)) {
-    $input = array_merge($input, json_decode($raw, true) ?? []);
+    $json = json_decode($raw, true);
+    if (is_array($json)) {
+        $input = array_merge($input, $json);
+    }
 }
 
 // Read input — support both form POST and JSON body
