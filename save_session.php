@@ -1,4 +1,22 @@
 <?php
+ini_set('display_errors', 0);
+error_reporting(0);
+
+header('Content-Type: application/json; charset=utf-8');
+
+// ← ADD DEBUG BLOCK HERE, before anything else
+if (isset($_GET['debug'])) {
+    echo json_encode([
+        'GET'    => $_GET,
+        'POST'   => $_POST,
+        'method' => $_SERVER['REQUEST_METHOD'],
+        'raw'    => substr(file_get_contents('php://input'), 0, 500)
+    ]);
+    exit(0);
+}
+
+require(dirname(__FILE__) . "/config.php");
+
 /**
  * BPgranny Session Save API
  * Stores full game session + per-trial data to the database
