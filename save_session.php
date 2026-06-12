@@ -4,17 +4,6 @@ error_reporting(0);
 
 header('Content-Type: application/json; charset=utf-8');
 
-// Debug mode
-if (isset($_GET['debug'])) {
-    echo json_encode([
-        'GET'    => $_GET,
-        'POST'   => $_POST,
-        'method' => $_SERVER['REQUEST_METHOD'],
-        'raw'    => substr(file_get_contents('php://input'), 0, 500)
-    ]);
-    exit(0);
-}
-
 require(dirname(__FILE__) . "/config.php");
 
 // Accept parameters from GET, POST, or JSON body
@@ -41,10 +30,23 @@ $playername = trim($input['playername']);
 $score      = (int)$input['score'];
 $level      = (int)($input['level'] ?? 0);
 $mistakes   = (int)($input['mistakes'] ?? 0);
-$shots      = (int)($input['total_shots_fired'] ?? 0);
-$minutes    = (int)($input['play_time_minutes'] ?? 0);
-$seconds    = (int)($input['play_time_seconds'] ?? 0);
+$shots      = (int)($input['shots'] ?? $input['total_shots_fired'] ?? 0);
+$minutes    = (int)($input['minutes'] ?? $input['play_time_minutes'] ?? 0);
+$seconds    = (int)($input['seconds'] ?? $input['play_time_seconds'] ?? 0);
 $code       = trim($input['code']);
+
+// Debug mode — shows received values and expected hash (remove before going live)
+if (isset($input['debug'])) {
+    $expected_debug = md5($gameid . $playername . $score . $secret_key);
+    echo json_encode([
+        'GET'           => $_GET,
+        'POST'          => $_POST,
+        'received_code' => $code,
+        'expected_code' => $expected_debug,
+        'hash_input'    => $gameid . $playername . $score . $secret_key
+    ]);
+    exit;
+}
 
 // Validate Prolific ID format
 if (!preg_match('/^[a-zA-Z0-9]{24}$/', $playername)) {
