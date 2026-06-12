@@ -12,7 +12,7 @@ $dbname = getenv('DB_NAME') ?: 'railway';
 $port = (int)(getenv('DB_PORT') ?: 3306);
 
 // Application configuration
-$secret_key = getenv('SECRET_KEY') ?: 'dragonfruit42';
+$secret_key = getenv('SECRET_KEY') ?: 'bearpearonabeerpier';
 $tname = getenv('TABLE_NAME') ?: 'scores';
 $score_number = (int)(getenv('SCORE_NUMBER') ?: 10);
 ?>
