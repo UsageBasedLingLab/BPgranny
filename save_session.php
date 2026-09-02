@@ -29,6 +29,7 @@ $gameid     = (int)$input['gameid'];
 $playername = trim($input['playername']);
 $score      = (int)$input['score'];
 $level      = (int)($input['level'] ?? 0);
+$stage      = (int)($input['stage'] ?? 0);
 $mistakes   = (int)($input['mistakes'] ?? 0);
 $shots      = (int)($input['shots'] ?? $input['total_shots_fired'] ?? 0);
 $minutes    = (int)($input['minutes'] ?? $input['play_time_minutes'] ?? 0);
@@ -119,10 +120,10 @@ mysqli_query($db, "CREATE TABLE IF NOT EXISTS `game_trials` (
 
 // Insert session
 $stmt = mysqli_prepare($db,
-    "INSERT INTO game_sessions (gameid, playername, level, score, mistakes, total_shots_fired, play_time_minutes, play_time_seconds)
+    "INSERT INTO game_sessions (gameid, playername, level, stage, score, mistakes, total_shots_fired, play_time_minutes, play_time_seconds)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 );
-mysqli_stmt_bind_param($stmt, 'isiiiiii', $gameid, $playername, $level, $score, $mistakes, $shots, $minutes, $seconds);
+mysqli_stmt_bind_param($stmt, 'isiiiiii', $gameid, $playername, $level, $stage, $score, $mistakes, $shots, $minutes, $seconds);
 
 if (!mysqli_stmt_execute($stmt)) {
     http_response_code(500);
