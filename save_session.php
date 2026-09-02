@@ -98,6 +98,7 @@ mysqli_query($db, "CREATE TABLE IF NOT EXISTS `game_sessions` (
     `gameid`              VARCHAR(255) NOT NULL,
     `playername`          VARCHAR(255) NOT NULL,
     `level`               INT NOT NULL DEFAULT 0,
+    `stage`               INT NOT NULL DEFAULT 0,
     `score`               INT NOT NULL DEFAULT 0,
     `mistakes`            INT NOT NULL DEFAULT 0,
     `total_shots_fired`   INT NOT NULL DEFAULT 0,
