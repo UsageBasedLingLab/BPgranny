@@ -80,6 +80,8 @@ if (!empty($input['trialdata'])) {
                 'hit'           => $parts[2] ?? 0,
                 'enemy_number'  => $parts[3] ?? 0,
                 'stage'         => $parts[4] ?? 0,
+                'target_type'   => $parts[5] ?? 0,
+                'click_type'    => $parts[6] ?? 0,
             ];
         }
     }
@@ -134,6 +136,8 @@ mysqli_query($db, "CREATE TABLE IF NOT EXISTS `game_trials` (
     `hit`             TINYINT(1) NOT NULL DEFAULT 0,
     `enemy_number`    INT NOT NULL DEFAULT 0,
     `stage`           INT NOT NULL DEFAULT 0,
+    `target_type`     TINYINT(1) NOT NULL DEFAULT 0,
+    `click_type`      TINYINT(1) NOT NULL DEFAULT 0,
     INDEX (`session_id`),
     FOREIGN KEY (`session_id`) REFERENCES `game_sessions`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
@@ -146,6 +150,14 @@ if ($col_check && mysqli_num_rows($col_check) === 0) {
 $col_check2 = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'stage'");
 if ($col_check2 && mysqli_num_rows($col_check2) === 0) {
     mysqli_query($db, "ALTER TABLE `game_trials` ADD COLUMN `stage` INT NOT NULL DEFAULT 0");
+}
+$col_check3 = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'target_type'");
+if ($col_check3 && mysqli_num_rows($col_check3) === 0) {
+    mysqli_query($db, "ALTER TABLE `game_trials` ADD COLUMN `target_type` TINYINT(1) NOT NULL DEFAULT 0");
+}
+$col_check4 = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'click_type'");
+if ($col_check4 && mysqli_num_rows($col_check4) === 0) {
+    mysqli_query($db, "ALTER TABLE `game_trials` ADD COLUMN `click_type` TINYINT(1) NOT NULL DEFAULT 0");
 }
 
 // Insert session
@@ -169,7 +181,7 @@ mysqli_stmt_close($stmt);
 // Insert trials
 if (!empty($trials)) {
     $tstmt = mysqli_prepare($db,
-        "INSERT INTO game_trials (session_id, trial_index, stimulus, reaction_time, hit, enemy_number, stage) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO game_trials (session_id, trial_index, stimulus, reaction_time, hit, enemy_number, stage, target_type, click_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
     foreach ($trials as $i => $trial) {
         $stimulus = substr(trim($trial['stimulus'] ?? ''), 0, 255);
@@ -177,7 +189,9 @@ if (!empty($trials)) {
         $hit      = (int)($trial['hit'] ?? 0);
         $enemy    = (int)($trial['enemy_number'] ?? 0);
         $stg      = (int)($trial['stage'] ?? 0);
-        mysqli_stmt_bind_param($tstmt, 'iisdiii', $session_id, $i, $stimulus, $rt, $hit, $enemy, $stg);
+        $target   = (int)($trial['target_type'] ?? 0);
+        $click    = (int)($trial['click_type'] ?? 0);
+        mysqli_stmt_bind_param($tstmt, 'iisdiiiii', $session_id, $i, $stimulus, $rt, $hit, $enemy, $stg, $target, $click);
         mysqli_stmt_execute($tstmt);
     }
     mysqli_stmt_close($tstmt);
