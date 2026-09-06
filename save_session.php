@@ -64,9 +64,26 @@ if (!hash_equals($expected, $code)) {
     exit(1);
 }
 
-// Parse trials
+// Parse trials — supports Clickteam's "stimulus~reaction_time~hit~enemy_number~stage|..." format,
+// plus legacy JSON 'trials' array and t{i}_s/t{i}_r/t{i}_h fallback.
 $trials = [];
-if (!empty($input['trials'])) {
+
+if (!empty($input['trialdata'])) {
+    $raw_td = rtrim(trim($input['trialdata']), '|');
+    if ($raw_td !== '') {
+        $rows = explode('|', $raw_td);
+        foreach ($rows as $i => $row) {
+            $parts = explode('~', $row);
+            $trials[$i] = [
+                'stimulus'      => $parts[0] ?? '',
+                'reaction_time' => $parts[1] ?? 0,
+                'hit'           => $parts[2] ?? 0,
+                'enemy_number'  => $parts[3] ?? 0,
+                'stage'         => $parts[4] ?? 0,
+            ];
+        }
+    }
+} elseif (!empty($input['trials'])) {
     $decoded = is_array($input['trials']) ? $input['trials'] : json_decode($input['trials'], true);
     if (is_array($decoded)) {
         $trials = $decoded;
@@ -115,16 +132,28 @@ mysqli_query($db, "CREATE TABLE IF NOT EXISTS `game_trials` (
     `stimulus`        VARCHAR(255) NOT NULL DEFAULT '',
     `reaction_time`   FLOAT NOT NULL DEFAULT 0,
     `hit`             TINYINT(1) NOT NULL DEFAULT 0,
+    `enemy_number`    INT NOT NULL DEFAULT 0,
+    `stage`           INT NOT NULL DEFAULT 0,
     INDEX (`session_id`),
     FOREIGN KEY (`session_id`) REFERENCES `game_sessions`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+// If the table already existed from before (without these columns), add them if missing.
+$col_check = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'enemy_number'");
+if ($col_check && mysqli_num_rows($col_check) === 0) {
+    mysqli_query($db, "ALTER TABLE `game_trials` ADD COLUMN `enemy_number` INT NOT NULL DEFAULT 0");
+}
+$col_check2 = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'stage'");
+if ($col_check2 && mysqli_num_rows($col_check2) === 0) {
+    mysqli_query($db, "ALTER TABLE `game_trials` ADD COLUMN `stage` INT NOT NULL DEFAULT 0");
+}
+
 // Insert session
 $stmt = mysqli_prepare($db,
     "INSERT INTO game_sessions (gameid, playername, level, stage, score, mistakes, total_shots_fired, play_time_minutes, play_time_seconds)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
-mysqli_stmt_bind_param($stmt, 'isiiiiii', $gameid, $playername, $level, $stage, $score, $mistakes, $shots, $minutes, $seconds);
+mysqli_stmt_bind_param($stmt, 'isiiiiiii', $gameid, $playername, $level, $stage, $score, $mistakes, $shots, $minutes, $seconds);
 
 if (!mysqli_stmt_execute($stmt)) {
     http_response_code(500);
@@ -140,13 +169,15 @@ mysqli_stmt_close($stmt);
 // Insert trials
 if (!empty($trials)) {
     $tstmt = mysqli_prepare($db,
-        "INSERT INTO game_trials (session_id, trial_index, stimulus, reaction_time, hit) VALUES (?, ?, ?, ?, ?)"
+        "INSERT INTO game_trials (session_id, trial_index, stimulus, reaction_time, hit, enemy_number, stage) VALUES (?, ?, ?, ?, ?, ?, ?)"
     );
     foreach ($trials as $i => $trial) {
         $stimulus = substr(trim($trial['stimulus'] ?? ''), 0, 255);
         $rt       = (float)($trial['reaction_time'] ?? 0);
         $hit      = (int)($trial['hit'] ?? 0);
-        mysqli_stmt_bind_param($tstmt, 'iisdi', $session_id, $i, $stimulus, $rt, $hit);
+        $enemy    = (int)($trial['enemy_number'] ?? 0);
+        $stg      = (int)($trial['stage'] ?? 0);
+        mysqli_stmt_bind_param($tstmt, 'iisdiii', $session_id, $i, $stimulus, $rt, $hit, $enemy, $stg);
         mysqli_stmt_execute($tstmt);
     }
     mysqli_stmt_close($tstmt);
