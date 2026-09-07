@@ -30,6 +30,7 @@ DB_PORT=3306
 SECRET_KEY=your_secret_key_here
 TABLE_NAME=scores
 SCORE_NUMBER=10
+DEBUG_SAVE_SESSION=false
 ```
 
 ### 2. Docker Deployment
