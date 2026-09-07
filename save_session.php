@@ -36,15 +36,15 @@ $minutes    = (int)($input['minutes'] ?? $input['play_time_minutes'] ?? 0);
 $seconds    = (int)($input['seconds'] ?? $input['play_time_seconds'] ?? 0);
 $code       = trim($input['code']);
 
-// Debug mode — shows received values and expected hash (remove before going live)
-if (isset($input['debug'])) {
+// Debug mode is controlled by the server, never by a client query parameter.
+if ($debug_save_session && isset($input['debug'])) {
     $expected_debug = md5($gameid . $playername . $score . $secret_key);
     echo json_encode([
         'GET'           => $_GET,
         'POST'          => $_POST,
         'received_code' => $code,
         'expected_code' => $expected_debug,
-        'hash_input'    => $gameid . $playername . $score . $secret_key
+        'hash_matches' => hash_equals($expected_debug, $code)
     ]);
     exit;
 }
