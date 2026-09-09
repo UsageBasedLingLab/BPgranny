@@ -166,12 +166,11 @@ $stmt = mysqli_prepare($db,
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
 if (!$stmt) {
-    $db_error = mysqli_error($db);
-    error_log('Session prepare failed: ' . $db_error);
+    error_log('Session prepare failed: ' . mysqli_error($db));
     http_response_code(500);
     $response = ['error' => 'Failed to prepare session save'];
     if ($debug_save_session) {
-        $response['details'] = $db_error;
+        $response['details'] = mysqli_error($db);
     }
     echo json_encode($response);
     mysqli_close($db);
@@ -202,12 +201,11 @@ if (!empty($trials)) {
         "INSERT INTO game_trials (session_id, trial_index, stimulus, reaction_time, hit, enemy_number, stage, target_type, click_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
     if (!$tstmt) {
-        $db_error = mysqli_error($db);
-        error_log('Trial prepare failed: ' . $db_error);
+        error_log('Trial prepare failed: ' . mysqli_error($db));
         http_response_code(500);
         $response = ['error' => 'Failed to prepare trial save'];
         if ($debug_save_session) {
-            $response['details'] = $db_error;
+            $response['details'] = mysqli_error($db);
         }
         echo json_encode($response);
         mysqli_close($db);
@@ -228,7 +226,7 @@ if (!empty($trials)) {
             http_response_code(500);
             $response = ['error' => 'Failed to save trial'];
             if ($debug_save_session) {
-                $response['details'] = $db_error;
+                $response['details'] = "Index {$i}: {$db_error}";
             }
             echo json_encode($response);
             mysqli_stmt_close($tstmt);
