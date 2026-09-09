@@ -29,13 +29,13 @@ $out = fopen('php://output', 'w');
 fputcsv($out, [
     'session_id','gameid','playername','level','score','mistakes',
     'total_shots_fired','play_time_minutes','play_time_seconds','saved_at',
-    'trial_index','stimulus','reaction_time','hit'
+    'trial_playername','trial_index','stimulus','reaction_time','hit'
 ]);
 
 $result = mysqli_query($db,
     "SELECT s.id, s.gameid, s.playername, s.level, s.score, s.mistakes,
             s.total_shots_fired, s.play_time_minutes, s.play_time_seconds, s.saved_at,
-            t.trial_index, t.stimulus, t.reaction_time, t.hit
+            t.playername AS trial_playername, t.trial_index, t.stimulus, t.reaction_time, t.hit
      FROM game_sessions s
      LEFT JOIN game_trials t ON t.session_id = s.id
      ORDER BY s.id ASC, t.trial_index ASC"
