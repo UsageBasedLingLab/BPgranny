@@ -157,6 +157,22 @@ mysqli_query($db, "CREATE TABLE IF NOT EXISTS `game_trials` (
     FOREIGN KEY (`session_id`) REFERENCES `game_sessions`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+// If the session table already existed from an older version, add new columns.
+$session_columns = [
+    'level' => 'INT NOT NULL DEFAULT 0',
+    'stage' => 'INT NOT NULL DEFAULT 0',
+    'mistakes' => 'INT NOT NULL DEFAULT 0',
+    'total_shots_fired' => 'INT NOT NULL DEFAULT 0',
+    'play_time_minutes' => 'INT NOT NULL DEFAULT 0',
+    'play_time_seconds' => 'INT NOT NULL DEFAULT 0',
+];
+foreach ($session_columns as $column => $definition) {
+    $column_check = mysqli_query($db, "SHOW COLUMNS FROM `game_sessions` LIKE '" . mysqli_real_escape_string($db, $column) . "'");
+    if ($column_check && mysqli_num_rows($column_check) === 0) {
+        mysqli_query($db, "ALTER TABLE `game_sessions` ADD COLUMN `$column` $definition");
+    }
+}
+
 // If the table already existed from before (without these columns), add them if missing.
 $col_check = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'enemy_number'");
 if ($col_check && mysqli_num_rows($col_check) === 0) {
