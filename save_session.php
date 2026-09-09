@@ -6,6 +6,21 @@ header('Content-Type: application/json; charset=utf-8');
 
 require(dirname(__FILE__) . "/config.php");
 
+if ($debug_save_session) {
+    register_shutdown_function(function () {
+        $error = error_get_last();
+        if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Fatal PHP error',
+                'details' => $error['message'],
+                'file' => basename($error['file']),
+                'line' => $error['line']
+            ]);
+        }
+    });
+}
+
 // Accept parameters from GET, POST, or JSON body
 $input = array_merge($_GET, $_POST);
 $raw = file_get_contents('php://input');
