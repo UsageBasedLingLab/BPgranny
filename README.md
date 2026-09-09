@@ -145,7 +145,7 @@ GET /score_script.php?gameid=123
 
 ### New Database Tables
 - **`game_sessions`** — Stores level, score, mistakes, shots fired, and play time per session
-- **`game_trials`** — Stores per-trial stimulus, reaction time, and hit, linked to a session
+- **`game_trials`** — Stores player ID, per-trial stimulus, reaction time, and hit, linked to a session. Trials with reaction time `0` are ignored.
 
 ### Export Your Data
 Visit: https://bpgranny-production.up.railway.app/export.php?password=YOUR_EXPORT_PASSWORD
