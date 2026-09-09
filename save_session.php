@@ -165,9 +165,17 @@ $stmt = mysqli_prepare($db,
     "INSERT INTO game_sessions (gameid, playername, level, stage, score, mistakes, total_shots_fired, play_time_minutes, play_time_seconds)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
+if (!$stmt) {
+    error_log('Session prepare failed: ' . mysqli_error($db));
+    http_response_code(500);
+    echo json_encode(['error' => 'Failed to prepare session save']);
+    mysqli_close($db);
+    exit(1);
+}
 mysqli_stmt_bind_param($stmt, 'isiiiiiii', $gameid, $playername, $level, $stage, $score, $mistakes, $shots, $minutes, $seconds);
 
 if (!mysqli_stmt_execute($stmt)) {
+    error_log('Session insert failed: ' . mysqli_stmt_error($stmt));
     http_response_code(500);
     echo json_encode(['error' => 'Failed to save session']);
     mysqli_stmt_close($stmt);
@@ -183,6 +191,13 @@ if (!empty($trials)) {
     $tstmt = mysqli_prepare($db,
         "INSERT INTO game_trials (session_id, trial_index, stimulus, reaction_time, hit, enemy_number, stage, target_type, click_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
+    if (!$tstmt) {
+        error_log('Trial prepare failed: ' . mysqli_error($db));
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to prepare trial save']);
+        mysqli_close($db);
+        exit(1);
+    }
     foreach ($trials as $i => $trial) {
         $stimulus = substr(trim($trial['stimulus'] ?? ''), 0, 255);
         $rt       = (float)($trial['reaction_time'] ?? 0);
@@ -192,7 +207,14 @@ if (!empty($trials)) {
         $target   = (int)($trial['target_type'] ?? 0);
         $click    = (int)($trial['click_type'] ?? 0);
         mysqli_stmt_bind_param($tstmt, 'iisdiiiii', $session_id, $i, $stimulus, $rt, $hit, $enemy, $stg, $target, $click);
-        mysqli_stmt_execute($tstmt);
+        if (!mysqli_stmt_execute($tstmt)) {
+            error_log("Trial insert failed at index {$i}: " . mysqli_stmt_error($tstmt));
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to save trial']);
+            mysqli_stmt_close($tstmt);
+            mysqli_close($db);
+            exit(1);
+        }
     }
     mysqli_stmt_close($tstmt);
 }
