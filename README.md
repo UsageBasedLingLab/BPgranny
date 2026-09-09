@@ -4,7 +4,7 @@ A lightweight, secure PHP-based high-score tracking system for games.
 
 ## Features
 
-✅ **Score Management** - Store and retrieve game scores  
+✅ **Score Management** - Store and retrieve game scores.  
 ✅ **Security** - MD5 hash validation for score submissions  
 ✅ **JSON API** - RESTful endpoints for game clients  
 ✅ **Auto-initialization** - Automatically creates database tables  
