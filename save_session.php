@@ -168,16 +168,25 @@ $stmt = mysqli_prepare($db,
 if (!$stmt) {
     error_log('Session prepare failed: ' . mysqli_error($db));
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to prepare session save']);
+    $response = ['error' => 'Failed to prepare session save'];
+    if ($debug_save_session) {
+        $response['details'] = mysqli_error($db);
+    }
+    echo json_encode($response);
     mysqli_close($db);
     exit(1);
 }
 mysqli_stmt_bind_param($stmt, 'isiiiiiii', $gameid, $playername, $level, $stage, $score, $mistakes, $shots, $minutes, $seconds);
 
 if (!mysqli_stmt_execute($stmt)) {
-    error_log('Session insert failed: ' . mysqli_stmt_error($stmt));
+    $db_error = mysqli_stmt_error($stmt);
+    error_log('Session insert failed: ' . $db_error);
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to save session']);
+    $response = ['error' => 'Failed to save session'];
+    if ($debug_save_session) {
+        $response['details'] = $db_error;
+    }
+    echo json_encode($response);
     mysqli_stmt_close($stmt);
     mysqli_close($db);
     exit(1);
@@ -194,7 +203,11 @@ if (!empty($trials)) {
     if (!$tstmt) {
         error_log('Trial prepare failed: ' . mysqli_error($db));
         http_response_code(500);
-        echo json_encode(['error' => 'Failed to prepare trial save']);
+        $response = ['error' => 'Failed to prepare trial save'];
+        if ($debug_save_session) {
+            $response['details'] = mysqli_error($db);
+        }
+        echo json_encode($response);
         mysqli_close($db);
         exit(1);
     }
@@ -208,9 +221,14 @@ if (!empty($trials)) {
         $click    = (int)($trial['click_type'] ?? 0);
         mysqli_stmt_bind_param($tstmt, 'iisdiiiii', $session_id, $i, $stimulus, $rt, $hit, $enemy, $stg, $target, $click);
         if (!mysqli_stmt_execute($tstmt)) {
-            error_log("Trial insert failed at index {$i}: " . mysqli_stmt_error($tstmt));
+            $db_error = mysqli_stmt_error($tstmt);
+            error_log("Trial insert failed at index {$i}: " . $db_error);
             http_response_code(500);
-            echo json_encode(['error' => 'Failed to save trial']);
+            $response = ['error' => 'Failed to save trial'];
+            if ($debug_save_session) {
+                $response['details'] = "Index {$i}: {$db_error}";
+            }
+            echo json_encode($response);
             mysqli_stmt_close($tstmt);
             mysqli_close($db);
             exit(1);
