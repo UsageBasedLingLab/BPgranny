@@ -16,4 +16,5 @@ $secret_key = getenv('SECRET_KEY') ?: 'bearpearonabeerpier';
 $tname = getenv('TABLE_NAME') ?: 'scores';
 $score_number = (int)(getenv('SCORE_NUMBER') ?: 10);
 $debug_save_session = filter_var(getenv('DEBUG_SAVE_SESSION') ?: 'false', FILTER_VALIDATE_BOOLEAN);
+$save_dedup_window_seconds = max(0, (int)(getenv('SAVE_DEDUP_WINDOW_SECONDS') ?: 10));
 ?>

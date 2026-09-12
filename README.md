@@ -31,6 +31,7 @@ SECRET_KEY=your_secret_key_here
 TABLE_NAME=scores
 SCORE_NUMBER=10
 DEBUG_SAVE_SESSION=false
+SAVE_DEDUP_WINDOW_SECONDS=10
 ```
 
 ### 2. Docker Deployment
@@ -146,6 +147,12 @@ GET /score_script.php?gameid=123
 ### New Database Tables
 - **`game_sessions`** — Stores level, score, mistakes, shots fired, and play time per session
 - **`game_trials`** — Stores player ID, per-trial stimulus, reaction time, and hit, linked to a session. Trials with reaction time `0` are ignored.
+
+`save_session.php` fingerprints the complete save payload. If the same payload is
+received again within `SAVE_DEDUP_WINDOW_SECONDS`, it returns the original
+`session_id` with `"status":"duplicate"` instead of creating another session.
+This is a safety net for duplicate Clickteam transition events; the game should
+still be corrected so it sends only one request.
 
 ### Export Your Data
 Visit: https://bpgranny-production.up.railway.app/export.php?password=YOUR_EXPORT_PASSWORD

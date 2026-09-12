@@ -51,6 +51,22 @@ $minutes    = (int)($input['minutes'] ?? $input['play_time_minutes'] ?? 0);
 $seconds    = (int)($input['seconds'] ?? $input['play_time_seconds'] ?? 0);
 $code       = trim($input['code']);
 
+// Identical retries are common when a game transition evaluates more than once.
+// Include all saved values so distinct level saves are never treated as retries.
+$request_fingerprint = hash('sha256', serialize([
+    'gameid' => $gameid,
+    'playername' => $playername,
+    'score' => $score,
+    'level' => $level,
+    'stage' => $stage,
+    'mistakes' => $mistakes,
+    'shots' => $shots,
+    'minutes' => $minutes,
+    'seconds' => $seconds,
+    'trialdata' => (string)($input['trialdata'] ?? ''),
+    'trials' => $input['trials'] ?? null,
+]));
+
 // Debug mode is controlled by the server, never by a client query parameter.
 if ($debug_save_session && isset($input['debug'])) {
     $expected_debug = md5($gameid . $playername . $score . $secret_key);
@@ -144,8 +160,10 @@ mysqli_query($db, "CREATE TABLE IF NOT EXISTS `game_sessions` (
     `total_shots_fired`   INT NOT NULL DEFAULT 0,
     `play_time_minutes`   INT NOT NULL DEFAULT 0,
     `play_time_seconds`   INT NOT NULL DEFAULT 0,
+    `request_fingerprint` CHAR(64) NULL,
     `saved_at`            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX (`gameid`)
+    INDEX (`gameid`),
+    INDEX (`request_fingerprint`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
 mysqli_query($db, "CREATE TABLE IF NOT EXISTS `game_trials` (
@@ -186,6 +204,46 @@ foreach ($session_columns as $column => $definition) {
     }
 }
 
+$fingerprint_check = mysqli_query($db, "SHOW COLUMNS FROM `game_sessions` LIKE 'request_fingerprint'");
+if ($fingerprint_check && mysqli_num_rows($fingerprint_check) === 0) {
+    mysqli_query($db, "ALTER TABLE `game_sessions` ADD COLUMN `request_fingerprint` CHAR(64) NULL");
+    mysqli_query($db, "ALTER TABLE `game_sessions` ADD INDEX `request_fingerprint_idx` (`request_fingerprint`)");
+}
+
+if ($save_dedup_window_seconds > 0) {
+    $dedup_cutoff = date('Y-m-d H:i:s', time() - $save_dedup_window_seconds);
+    $dedup_stmt = mysqli_prepare($db,
+        "SELECT id, score, level, stage
+         FROM game_sessions
+         WHERE request_fingerprint = ?
+         AND saved_at >= ?
+         ORDER BY id DESC
+         LIMIT 1"
+    );
+    if ($dedup_stmt) {
+        mysqli_stmt_bind_param($dedup_stmt, 'ss', $request_fingerprint, $dedup_cutoff);
+        $duplicate_id = null;
+        $duplicate_score = null;
+        $duplicate_level = null;
+        $duplicate_stage = null;
+        mysqli_stmt_bind_result($dedup_stmt, $duplicate_id, $duplicate_score, $duplicate_level, $duplicate_stage);
+        mysqli_stmt_execute($dedup_stmt);
+        $duplicate = mysqli_stmt_fetch($dedup_stmt)
+            ? ['id' => $duplicate_id, 'score' => $duplicate_score, 'level' => $duplicate_level, 'stage' => $duplicate_stage]
+            : null;
+        mysqli_stmt_close($dedup_stmt);
+        if ($duplicate) {
+            mysqli_close($db);
+            echo json_encode([
+                'status' => 'duplicate',
+                'session_id' => (int)$duplicate['id'],
+                'trials' => 0
+            ]);
+            exit(0);
+        }
+    }
+}
+
 // If the table already existed from before (without these columns), add them if missing.
 $col_check = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'enemy_number'");
 if ($col_check && mysqli_num_rows($col_check) === 0) {
@@ -206,8 +264,8 @@ if ($col_check4 && mysqli_num_rows($col_check4) === 0) {
 
 // Insert session
 $stmt = mysqli_prepare($db,
-    "INSERT INTO game_sessions (gameid, playername, level, stage, score, mistakes, total_shots_fired, play_time_minutes, play_time_seconds)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    "INSERT INTO game_sessions (gameid, playername, level, stage, score, mistakes, total_shots_fired, play_time_minutes, play_time_seconds, request_fingerprint)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
 if (!$stmt) {
     error_log('Session prepare failed: ' . mysqli_error($db));
@@ -220,7 +278,7 @@ if (!$stmt) {
     mysqli_close($db);
     exit(1);
 }
-mysqli_stmt_bind_param($stmt, 'isiiiiiii', $gameid, $playername, $level, $stage, $score, $mistakes, $shots, $minutes, $seconds);
+mysqli_stmt_bind_param($stmt, 'isiiiiiiis', $gameid, $playername, $level, $stage, $score, $mistakes, $shots, $minutes, $seconds, $request_fingerprint);
 
 if (!mysqli_stmt_execute($stmt)) {
     $db_error = mysqli_stmt_error($stmt);
