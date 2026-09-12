@@ -228,6 +228,21 @@ http://bpgranny.railway.internal
 - Try the status check first: `?status=1`
 - Check Railway dashboard for app errors
 
+### Duplicate session rows
+`Get URL` is asynchronous, and a level-transition condition can be evaluated
+more than once. Keep exactly one `Get URL SaveURL` action for the transition,
+then add a temporary counter as the first action in that event. Compare the
+counter with the browser Network request count:
+
+- Counter increments twice: the transition event is firing twice.
+- Counter increments once but two requests appear: another event also calls
+  `Get URL`.
+- Both increment once: the duplicate request is resolved.
+
+The save endpoint also fingerprints the complete payload and suppresses an
+identical retry received within `SAVE_DEDUP_WINDOW_SECONDS`. This protects the
+database, but it does not replace removing the extra Fusion event path.
+
 ## 📝 Multi-Game Setup
 
 To support multiple games, just use different Game IDs:
