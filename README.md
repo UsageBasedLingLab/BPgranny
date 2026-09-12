@@ -146,7 +146,7 @@ GET /score_script.php?gameid=123
 
 ### New Database Tables
 - **`game_sessions`** — Stores level, score, mistakes, shots fired, and play time per session
-- **`game_trials`** — Stores player ID, per-trial stimulus, reaction time, and hit, linked to a session. Trials with reaction time `0` are ignored.
+- **`game_trials`** — Stores player ID, per-trial stimulus, reaction time, hit, enemy number, stage, target type, and click type, linked to a session. Trials with reaction time `0` are ignored.
 
 `save_session.php` fingerprints the complete save payload. If the same payload is
 received again within `SAVE_DEDUP_WINDOW_SECONDS`, it returns the original
