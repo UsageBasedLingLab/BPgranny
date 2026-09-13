@@ -155,9 +155,31 @@ This is a safety net for duplicate Clickteam transition events; the game should
 still be corrected so it sends only one request.
 
 ### Export Your Data
-Visit: https://bpgranny-production.up.railway.app/export.php?password=YOUR_EXPORT_PASSWORD
 
-Downloads a CSV with one row per trial across all recorded sessions.
+To download all recorded sessions and trial rows as a CSV, first set a real
+`EXPORT_PASSWORD` value in Railway under **Project → Variables**. Then open
+the following URL in a browser, replacing the placeholder with that password:
+
+```text
+https://bpgranny-production.up.railway.app/export.php?password=YOUR_EXPORT_PASSWORD
+```
+
+The browser downloads a file named like
+`bpgranny_sessions_2026-09-13.csv`. Open it with Excel, Google Sheets, or
+LibreOffice. The export includes session and trial fields such as:
+
+```text
+session_id, gameid, playername, level, score, mistakes,
+total_shots_fired, play_time_minutes, play_time_seconds, saved_at,
+trial_playername, trial_index, stimulus, reaction_time, hit,
+enemy_number, stage, target_type, click_type
+```
+
+Do not commit or publicly share the completed export URL because it contains
+the export password. If `EXPORT_PASSWORD` is not configured, the development
+fallback is `changeme`; replace it with a real Railway variable before using
+the endpoint.
+Visit: https://bpgranny-production.up.railway.app/export.php?password=YOUR_EXPORT_PASSWORD
 
 ## Security Notes
 
