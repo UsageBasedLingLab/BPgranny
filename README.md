@@ -172,7 +172,7 @@ LibreOffice. The export includes session and trial fields such as:
 session_id, gameid, playername, level, score, mistakes,
 total_shots_fired, play_time_minutes, play_time_seconds, saved_at,
 trial_playername, trial_index, stimulus, reaction_time, hit,
-enemy_number, stage, target_type, click_type
+enemy_number, stage, target_type
 ```
 
 Do not commit or publicly share the completed export URL because it contains

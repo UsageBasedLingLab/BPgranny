@@ -112,7 +112,6 @@ if (!empty($input['trialdata'])) {
                 'enemy_number'  => $parts[3] ?? 0,
                 'stage'         => $parts[4] ?? 0,
                 'target_type'   => $parts[5] ?? 0,
-                'click_type'    => $parts[6] ?? 0,
             ];
         }
     }
@@ -177,7 +176,6 @@ mysqli_query($db, "CREATE TABLE IF NOT EXISTS `game_trials` (
     `enemy_number`    INT NOT NULL DEFAULT 0,
     `stage`           INT NOT NULL DEFAULT 0,
     `target_type`     TINYINT(1) NOT NULL DEFAULT 0,
-    `click_type`      TINYINT(1) NOT NULL DEFAULT 0,
     INDEX (`session_id`),
     FOREIGN KEY (`session_id`) REFERENCES `game_sessions`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
@@ -257,9 +255,9 @@ $col_check3 = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'target_ty
 if ($col_check3 && mysqli_num_rows($col_check3) === 0) {
     mysqli_query($db, "ALTER TABLE `game_trials` ADD COLUMN `target_type` TINYINT(1) NOT NULL DEFAULT 0");
 }
-$col_check4 = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'click_type'");
-if ($col_check4 && mysqli_num_rows($col_check4) === 0) {
-    mysqli_query($db, "ALTER TABLE `game_trials` ADD COLUMN `click_type` TINYINT(1) NOT NULL DEFAULT 0");
+$click_type_check = mysqli_query($db, "SHOW COLUMNS FROM `game_trials` LIKE 'click_type'");
+if ($click_type_check && mysqli_num_rows($click_type_check) > 0) {
+    mysqli_query($db, "ALTER TABLE `game_trials` DROP COLUMN `click_type`");
 }
 
 // Insert session
@@ -300,7 +298,7 @@ mysqli_stmt_close($stmt);
 // Insert trials
 if (!empty($trials)) {
     $tstmt = mysqli_prepare($db,
-        "INSERT INTO game_trials (session_id, playername, trial_index, stimulus, reaction_time, hit, enemy_number, stage, target_type, click_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "INSERT INTO game_trials (session_id, playername, trial_index, stimulus, reaction_time, hit, enemy_number, stage, target_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
     if (!$tstmt) {
         error_log('Trial prepare failed: ' . mysqli_error($db));
@@ -320,8 +318,7 @@ if (!empty($trials)) {
         $enemy    = (int)($trial['enemy_number'] ?? 0);
         $stg      = (int)($trial['stage'] ?? 0);
         $target   = (int)($trial['target_type'] ?? 0);
-        $click    = (int)($trial['click_type'] ?? 0);
-        mysqli_stmt_bind_param($tstmt, 'isisdiiiii', $session_id, $playername, $i, $stimulus, $rt, $hit, $enemy, $stg, $target, $click);
+        mysqli_stmt_bind_param($tstmt, 'isisdiiii', $session_id, $playername, $i, $stimulus, $rt, $hit, $enemy, $stg, $target);
         if (!mysqli_stmt_execute($tstmt)) {
             $db_error = mysqli_stmt_error($tstmt);
             error_log("Trial insert failed at index {$i}: " . $db_error);

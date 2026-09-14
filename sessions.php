@@ -62,7 +62,7 @@ if (empty($sessions)) {
 // Fetch trials for each session
 $trial_stmt = mysqli_prepare($db,
     "SELECT trial_index, playername, stimulus, reaction_time, hit,
-            enemy_number, stage, target_type, click_type
+            enemy_number, stage, target_type
      FROM game_trials
      WHERE session_id = ?
      ORDER BY trial_index ASC"
