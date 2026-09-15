@@ -1,7 +1,10 @@
-# BPgranny Game Systems
+# Playing By Ear Game Systems
 
 This document summarizes the game systems, data flow, and safeguards discussed
-for the Clickteam Fusion game and its Railway/PHP data server.
+for the Clickteam Fusion game and its Railway/PHP data server. 
+
+Playing by ear is a top-down defense/reaction-time game built (based on tooling references below) most likely in Clickteam Fusion 2.5, developed as part of a research study. 
+The player defends a central point (a "grandma") from waves of enemies spawning from marked zones, while a fog-of-war (FOW) increases difficulty as the player progresses. 
 
 ## 1. Game flow
 
@@ -14,6 +17,133 @@ The game supports two gameplay modes:
 - **Mode 1:** the original enemy/audio-selection flow.
 - **Mode 2:** enemy/friend targets using the `Friend_OR_Enemy` value.
 
+----------------------------------------------------------------------------------
+
+2. Tech Stack
+Layer                           Technology
+Game engine                     Clickteam Fusion 2.5 
+Client platform                 Desktop build + HTML5/web export
+Backend/server                  PHP + MySQL
+Hosting                         Railway
+Source control                  GitHub
+Distribution                    itch.io
+Study/participant recruitment   Prolific
+
+---------------------------------------------------------------------------------
+
+3. Core Gameplay Systems (by feature area)
+
+3.1 Central Defense Point
+"Grandma" character - a rotating turret with animation and reticle tracking that follows the mouse/player pointer.
+
+3.2 Spawners / Enemy System
+Spawnzones and Score/Speed Rings — spawn points in each corner. 
+Randomized enemy spawning code (RRand (1,4) -spawn location is determined by a random number generator. 
+Invisible rings on the map that determines how many points are gained when an enemy is shot - the closer the more points. 
+Known historical bugs (should confirm current status):
+Enemy not respawning on player hit bug. Player can hit SPACE bar to respawn a bugged enemy
+Audio not playing on player hit bug. Player can hit SPACE bar to respawn a bugged enemy
+Watchdog function that attempts to fix spanning if player has not given any input for longer than a trial lasts.
+
+3.3 Combat / Player Input
+Basic projectile raytracing- Cookie Launcher 
+=In mode 1, left click fires. Mode 2 implements a right click. 
+
+3.4 Health / Resource / Scoring
+Basic Healthbar
+Decreases at a rate of -1/second. 
+Firing a shot costs health (-10) and health is regained on hit (+15) 
+
+
+----------------------------------------------------------------------------------
+
+3.5 Fog of War (FOW)
+dynamic FOW built → FOW visibility decreases in stages 2 & 3
+--> Each hit decreases visibility by 1/10
+
+
+3.6 Streak / Reward System
+1 hit yields from (distance (1-6) * level (1-5)) points based on distance. 
+
+1 hit of an enemy covered by the Fog Of War yields (distance (1-6) * current combo * level (1-5)) points
+----------------------------------------------------------------------------------
+
+3.7 Audio
+
+L1:|F0&Vowel|
+
+TL-275x35 B/P i
+TR- 275x35 B/P e
+BL- 165x35 B/P i
+BR- 165x35 B/P e
+
+L2:
+TL-275x(rrand(30,40)) B/P i
+TR- 275x(rrand(30,40)) B/P e
+BL- 165x(rrand(30,40)) B/P i
+BR- 165x(rrand(30,40)) B/P e
+
+L3:
+
+TL-275x (rrand(20,50)) B/P i
+TR- 275x(rrand(20,50)) B/P e
+BL- 165x(rrand(20,50)) B/P i
+BR- 165x(rrand(20,50)) B/P e
+
+L4:
+
+TL-260x (rrand(20,50)) B/P i
+TR- 260x(rrand(20,50)) B/P e
+BL- 180x(rrand(20,50)) B/P i
+BR- 180x(rrand(20,50)) B/P e
+
+L5:
+
+TL-245x (rrand(20,50)) B/P i
+TR- 245x(rrand(20,50)) B/P e
+BL- 195x(rrand(20,50)) B/P i
+BR- 195x(rrand(20,50)) B/P e
+
+MODE 2:
+High F0 = Friend
+Low F0 = Enemy
+
+L1:
+                    
+275x (rrand(35,40)) B/P i
+275x(rrand(35,40)) B/P e
+165x(rrand(35,40)) D/T i
+165x(rrand(35,40)) D/T e
+
+L2:
+
+275x (rrand(30,40)) B/P i
+275x(rrand(30,40)) B/P e
+165x(rrand(30,40)) D/T i
+165x(rrand(30,40)) D/T e
+
+L3
+TL-275x (rrand(20,50)) B/P i
+TR- 275x(rrand(20,50)) B/P e
+BL- 165x(rrand(20,50)) D/T i
+BR- 165x(rrand(20,50)) D/T e
+
+L4
+
+TL-275x (rrand(20,50)) B/P i
+TR- 275x(rrand(20,50)) B/P e
+BL- 165x(rrand(20,50)) D/T i
+BR- 165x(rrand(20,50)) D/T e
+
+L5
+
+TL-275x (rrand(20,50)) B/P i
+TR- 275x(rrand(20,50)) B/P e
+BL- 165x(rrand(20,50)) D/T i
+BR- 165x(rrand(20,50)) D/T e
+
+----------------------------------------------------------------------------------
+
 Stage values are assigned by the game and sent in two different places:
 
 - The session stage is sent as the URL parameter `stage=...`.
@@ -22,6 +152,10 @@ Stage values are assigned by the game and sent in two different places:
 
 These values are independent. A session can have `stage=1` while a trial row
 still contains stage `0` if the array value was not assigned.
+
+----------------------------------------------------------------------------------
+
+
 
 ## 2. Trial Text Array
 
