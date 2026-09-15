@@ -20,14 +20,15 @@ The game supports two gameplay modes:
 ----------------------------------------------------------------------------------
 
 2. Tech Stack
-Layer                           Technology
-Game engine                     Clickteam Fusion 2.5 
-Client platform                 Desktop build + HTML5/web export
-Backend/server                  PHP + MySQL
-Hosting                         Railway
-Source control                  GitHub
-Distribution                    itch.io
-Study/participant recruitment   Prolific
+|Layer     |                      Technology|<br>
+|--------------------------|-------------------|<br>
+|Game engine           |          Clickteam Fusion 2.5 |<br>
+|Client platform         |        Desktop build + HTML5/web export|<br>
+|Backend/server          |        PHP + MySQL|<br>
+|Hosting                 |        Railway|<br>
+|Source control          |        GitHub|<br>
+|Distribution             |       itch.io|<br>
+|Study/participant recruitment  | Prolific|<br>
 
 ---------------------------------------------------------------------------------
 
@@ -37,13 +38,14 @@ Study/participant recruitment   Prolific
 "Grandma" character - a rotating turret with animation and reticle tracking that follows the mouse/player pointer.
 
 3.2 Spawners / Enemy System
-Spawnzones and Score/Speed Rings — spawn points in each corner. 
-Randomized enemy spawning code (RRand (1,4) -spawn location is determined by a random number generator. 
-Invisible rings on the map that determines how many points are gained when an enemy is shot - the closer the more points. 
-Known historical bugs (should confirm current status):
-Enemy not respawning on player hit bug. Player can hit SPACE bar to respawn a bugged enemy
-Audio not playing on player hit bug. Player can hit SPACE bar to respawn a bugged enemy
-Watchdog function that attempts to fix spanning if player has not given any input for longer than a trial lasts.
+Spawnzones and Score/Speed Rings — spawn points in each corner. <br>
+Randomized enemy spawning code (RRand (1,4) -spawn location is determined by a random number generator. <br>
+Invisible rings on the map that determines how many points are gained when an enemy is shot - the closer the more points. <br>
+
+Known historical bugs (should confirm current status):<br>
+Enemy not respawning on player hit bug. Player can hit SPACE bar to respawn a bugged enemy<br>
+Audio not playing on player hit bug. Player can hit SPACE bar to respawn a bugged enemy<br>
+Watchdog function that attempts to fix spanning if player has not given any input for longer than a trial lasts.<br>
 
 3.3 Combat / Player Input
 Basic projectile raytracing- Cookie Launcher 
@@ -57,90 +59,90 @@ Firing a shot costs health (-10) and health is regained on hit (+15)
 
 ----------------------------------------------------------------------------------
 
-3.5 Fog of War (FOW)
-dynamic FOW built → FOW visibility decreases in stages 2 & 3
---> Each hit decreases visibility by 1/10
+3.5 Fog of War (FOW)<br>
+dynamic FOW built → FOW visibility decreases in stages 2 & 3<br>
+--> Each hit decreases visibility by 1/10<br>
 
 
-3.6 Streak / Reward System
-1 hit yields from (distance (1-6) * level (1-5)) points based on distance. 
+3.6 Streak / Reward System<br>
+1 hit yields from (distance (1-6) * level (1-5)) points based on distance. <br>
+1 hit of an enemy covered by the Fog Of War yields (distance (1-6) * current combo * level (1-5)) points<br>
 
-1 hit of an enemy covered by the Fog Of War yields (distance (1-6) * current combo * level (1-5)) points
 ----------------------------------------------------------------------------------
 
 3.7 Audio
 
-L1:|F0&Vowel|
+L1:|F0&Vowel|<br>
 
-TL-275x35 B/P i
-TR- 275x35 B/P e
-BL- 165x35 B/P i
-BR- 165x35 B/P e
+TL-275x35 B/P i<br>
+TR- 275x35 B/P e<br>
+BL- 165x35 B/P i<br>
+BR- 165x35 B/P e<br>
 
-L2:
-TL-275x(rrand(30,40)) B/P i
-TR- 275x(rrand(30,40)) B/P e
-BL- 165x(rrand(30,40)) B/P i
-BR- 165x(rrand(30,40)) B/P e
+L2:<br>
+TL-275x(rrand(30,40)) B/P i<br>
+TR- 275x(rrand(30,40)) B/P e<br>
+BL- 165x(rrand(30,40)) B/P i<br>
+BR- 165x(rrand(30,40)) B/P e<br>
 
-L3:
+L3:<br>
 
-TL-275x (rrand(20,50)) B/P i
-TR- 275x(rrand(20,50)) B/P e
-BL- 165x(rrand(20,50)) B/P i
-BR- 165x(rrand(20,50)) B/P e
+TL-275x (rrand(20,50)) B/P i<br>
+TR- 275x(rrand(20,50)) B/P e<br>
+BL- 165x(rrand(20,50)) B/P i<br>
+BR- 165x(rrand(20,50)) B/P e<br>
 
-L4:
+L4:<br>
 
-TL-260x (rrand(20,50)) B/P i
-TR- 260x(rrand(20,50)) B/P e
-BL- 180x(rrand(20,50)) B/P i
-BR- 180x(rrand(20,50)) B/P e
+TL-260x (rrand(20,50)) B/P i<br>
+TR- 260x(rrand(20,50)) B/P e<br>
+BL- 180x(rrand(20,50)) B/P i<br>
+BR- 180x(rrand(20,50)) B/P e<br>
 
-L5:
+L5:<br>
 
-TL-245x (rrand(20,50)) B/P i
-TR- 245x(rrand(20,50)) B/P e
-BL- 195x(rrand(20,50)) B/P i
-BR- 195x(rrand(20,50)) B/P e
+TL-245x (rrand(20,50)) B/P i<br>
+TR- 245x(rrand(20,50)) B/P e<br>
+BL- 195x(rrand(20,50)) B/P i<br>
+BR- 195x(rrand(20,50)) B/P e<br>
 
-MODE 2:
-High F0 = Friend
-Low F0 = Enemy
+MODE 2:<br>
+High F0 = Friend<br>
+Low F0 = Enemy<br>
 
-L1:
+L1:<br>
                     
-275x (rrand(35,40)) B/P i
-275x(rrand(35,40)) B/P e
-165x(rrand(35,40)) D/T i
-165x(rrand(35,40)) D/T e
+275x (rrand(35,40)) B/P i<br>
+275x(rrand(35,40)) B/P e<br>
+165x(rrand(35,40)) D/T i<br>
+165x(rrand(35,40)) D/T e<br>
 
-L2:
+L2:<br>
 
-275x (rrand(30,40)) B/P i
-275x(rrand(30,40)) B/P e
-165x(rrand(30,40)) D/T i
-165x(rrand(30,40)) D/T e
+275x (rrand(30,40)) B/P i<br>
+275x(rrand(30,40)) B/P e<br>
+165x(rrand(30,40)) D/T i<br>
+165x(rrand(30,40)) D/T e <br>
 
-L3
-TL-275x (rrand(20,50)) B/P i
-TR- 275x(rrand(20,50)) B/P e
-BL- 165x(rrand(20,50)) D/T i
-BR- 165x(rrand(20,50)) D/T e
+L3<br>
+TL-275x (rrand(20,50)) B/P i <br>
+TR- 275x(rrand(20,50)) B/P e<br>
+BL- 165x(rrand(20,50)) D/T i<br>
+BR- 165x(rrand(20,50)) D/T e<br>
 
-L4
+L4<br>
 
-TL-275x (rrand(20,50)) B/P i
-TR- 275x(rrand(20,50)) B/P e
-BL- 165x(rrand(20,50)) D/T i
-BR- 165x(rrand(20,50)) D/T e
+TL-275x (rrand(20,50)) B/P i<br>
+TR- 275x(rrand(20,50)) B/P e<br>
+BL- 165x(rrand(20,50)) D/T i<br>
+BR- 165x(rrand(20,50)) D/T e<br>
 
-L5
+L5<br>
 
-TL-275x (rrand(20,50)) B/P i
-TR- 275x(rrand(20,50)) B/P e
-BL- 165x(rrand(20,50)) D/T i
-BR- 165x(rrand(20,50)) D/T e
+TL-275x (rrand(20,50)) B/P i<br>
+TR- 275x(rrand(20,50)) B/P e<br>
+BL- 165x(rrand(20,50)) D/T i<br>
+BR- 165x(rrand(20,50)) D/T e<br>
 
 ----------------------------------------------------------------------------------
 
@@ -442,18 +444,3 @@ publicly share a completed export URL because it contains the password.
 The sessions-only export contains one row per `game_sessions` record. The
 combined export contains session fields followed by trial fields, including
 `target_type` and `audio_selection`.
-
-## 14. Final pre-release checks
-
-Before posting the game online:
-
-- Confirm Text Array Base 1 Index is disabled in every frame.
-- Confirm mode 1 and mode 2 write stimulus to Y=0.
-- Confirm `Friend_OR_Enemy` is written to Y=5.
-- Confirm `AudioSelection` is written to Y=6.
-- Confirm the TrialData append has all required `~` delimiters.
-- Confirm stage is assigned before building both the URL and trial row.
-- Confirm mistakes starts at zero and never becomes negative.
-- Confirm target/enemy number is nonzero when the design requires it.
-- Confirm only one save GET path runs per transition.
-- Confirm Railway has a real `EXPORT_PASSWORD`.
