@@ -175,6 +175,15 @@ trial_playername, trial_index, stimulus, reaction_time, hit,
 enemy_number, stage, target_type, audio_selection
 ```
 
+To export only the `game_sessions` table, use:
+
+```text
+https://bpgranny-production.up.railway.app/export.php?table=game_sessions&password=YOUR_EXPORT_PASSWORD
+```
+
+This downloads a file named like `bpgranny_game_sessions_2026-09-15.csv`
+with one row per saved session.
+
 Do not commit or publicly share the completed export URL because it contains
 the export password. If `EXPORT_PASSWORD` is not configured, the development
 fallback is `changeme`; replace it with a real Railway variable before using
