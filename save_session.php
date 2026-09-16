@@ -319,7 +319,7 @@ if (!empty($trials)) {
     }
     foreach ($trials as $i => $trial) {
         $stimulus = substr(trim($trial['stimulus'] ?? ''), 0, 255);
-        $rt       = (float)($trial['reaction_time'] ?? 0);
+        $rt       = round((float)($trial['reaction_time'] ?? 0), 3);
         $hit      = (int)($trial['hit'] ?? 0);
         $enemy    = (int)($trial['enemy_number'] ?? 0);
         $stg      = (int)($trial['stage'] ?? 0);
