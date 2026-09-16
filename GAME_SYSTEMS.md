@@ -42,7 +42,7 @@ Spawnzones and Score/Speed Rings — spawn points in each corner. <br>
 Randomized enemy spawning code (RRand (1,4) -spawn location is determined by a random number generator. <br>
 Invisible rings on the map that determines how many points are gained when an enemy is shot - the closer the more points. <br>
 
-Known historical bugs (should confirm current status):<br>
+Known historical bugs:<br>
 Enemy not respawning on player hit bug. Player can hit SPACE bar to respawn a bugged enemy<br>
 Audio not playing on player hit bug. Player can hit SPACE bar to respawn a bugged enemy<br>
 Watchdog function that attempts to fix spanning if player has not given any input for longer than a trial lasts.<br>
