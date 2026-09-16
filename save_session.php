@@ -47,8 +47,8 @@ $level      = (int)($input['level'] ?? 0);
 $stage      = (int)($input['stage'] ?? 0);
 $mistakes   = (int)($input['mistakes'] ?? 0);
 $shots      = (int)($input['shots'] ?? $input['total_shots_fired'] ?? 0);
-$minutes    = (int)($input['minutes'] ?? $input['play_time_minutes'] ?? 0);
-$seconds    = (int)($input['seconds'] ?? $input['play_time_seconds'] ?? 0);
+$minutes = (int)round((float)($input['minutes'] ?? $input['play_time_minutes'] ?? 0));
+$seconds = (int)round((float)($input['seconds'] ?? $input['play_time_seconds'] ?? 0));
 $code       = trim($input['code']);
 
 // Identical retries are common when a game transition evaluates more than once.
