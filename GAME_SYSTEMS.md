@@ -110,39 +110,73 @@ MODE 2:<br>
 High F0 = Friend<br>
 Low F0 = Enemy<br>
 
+MODE 2:<br>
+High F0 = Friend<br>
+Low F0 = Enemy<br>
+<br>
+Spatial mapping:<br>
+X-axis: /i/ = Left; /e/ = Right<br>
+Y-axis: B/P = Top; D/T = Bottom<br>
+<br>
 L1:<br>
-                    
-275x (rrand(35,40)) B/P i<br>
-275x(rrand(35,40)) B/P e<br>
-165x(rrand(35,40)) D/T i<br>
-165x(rrand(35,40)) D/T e<br>
-
+<br>
+Friend Top Left: 275x (rrand(35,40)) B/P i<br>
+Friend Top Right: 275x (rrand(35,40)) B/P e<br>
+Friend Bottom Left: 275x (rrand(35,40)) D/T i<br>
+Friend Bottom Right: 275x (rrand(35,40)) D/T e<br>
+<br>
+Enemy Top Left: 165x (rrand(35,40)) B/P i<br>
+Enemy Top Right: 165x (rrand(35,40)) B/P e<br>
+Enemy Bottom Left: 165x (rrand(35,40)) D/T i<br>
+Enemy Bottom Right: 165x (rrand(35,40)) D/T e<br>
+<br>
 L2:<br>
-
-275x (rrand(30,40)) B/P i<br>
-275x(rrand(30,40)) B/P e<br>
-165x(rrand(30,40)) D/T i<br>
-165x(rrand(30,40)) D/T e <br>
-
-L3<br>
-TL-275x (rrand(20,50)) B/P i <br>
-TR- 275x(rrand(20,50)) B/P e<br>
-BL- 165x(rrand(20,50)) D/T i<br>
-BR- 165x(rrand(20,50)) D/T e<br>
-
-L4<br>
-
-TL-275x (rrand(20,50)) B/P i<br>
-TR- 275x(rrand(20,50)) B/P e<br>
-BL- 165x(rrand(20,50)) D/T i<br>
-BR- 165x(rrand(20,50)) D/T e<br>
-
-L5<br>
-
-TL-275x (rrand(20,50)) B/P i<br>
-TR- 275x(rrand(20,50)) B/P e<br>
-BL- 165x(rrand(20,50)) D/T i<br>
-BR- 165x(rrand(20,50)) D/T e<br>
+<br>
+Friend Top Left: 275x (rrand(30,40)) B/P i<br>
+Friend Top Right: 275x (rrand(30,40)) B/P e<br>
+Friend Bottom Left: 275x (rrand(30,40)) D/T i<br>
+Friend Bottom Right: 275x (rrand(30,40)) D/T e<br>
+<br>
+Enemy Top Left: 165x (rrand(30,40)) B/P i<br>
+Enemy Top Right: 165x (rrand(30,40)) B/P e<br>
+Enemy Bottom Left: 165x (rrand(30,40)) D/T i<br>
+Enemy Bottom Right: 165x (rrand(30,40)) D/T e<br>
+<br>
+L3:<br>
+<br>
+Friend Top Left: 275x (rrand(20,50)) B/P i<br>
+Friend Top Right: 275x (rrand(20,50)) B/P e<br>
+Friend Bottom Left: 275x (rrand(20,50)) D/T i<br>
+Friend Bottom Right: 275x (rrand(20,50)) D/T e<br>
+<br>
+Enemy Top Left: 165x (rrand(20,50)) B/P i<br>
+Enemy Top Right: 165x (rrand(20,50)) B/P e<br>
+Enemy Bottom Left: 165x (rrand(20,50)) D/T i<br>
+Enemy Bottom Right: 165x (rrand(20,50)) D/T e<br>
+<br>
+L4:<br>
+<br>
+Friend Top Left: 275x (rrand(20,50)) B/P i<br>
+Friend Top Right: 275x (rrand(20,50)) B/P e<br>
+Friend Bottom Left: 275x (rrand(20,50)) D/T i<br>
+Friend Bottom Right: 275x (rrand(20,50)) D/T e<br>
+<br>
+Enemy Top Left: 165x (rrand(20,50)) B/P i<br>
+Enemy Top Right: 165x (rrand(20,50)) B/P e<br>
+Enemy Bottom Left: 165x (rrand(20,50)) D/T i<br>
+Enemy Bottom Right: 165x (rrand(20,50)) D/T e<br>
+<br>
+L5:<br>
+<br>
+Friend Top Left: 275x (rrand(20,50)) B/P i<br>
+Friend Top Right: 275x (rrand(20,50)) B/P e<br>
+Friend Bottom Left: 275x (rrand(20,50)) D/T i<br>
+Friend Bottom Right: 275x (rrand(20,50)) D/T e<br>
+<br>
+Enemy Top Left: 165x (rrand(20,50)) B/P i<br>
+Enemy Top Right: 165x (rrand(20,50)) B/P e<br>
+Enemy Bottom Left: 165x (rrand(20,50)) D/T i<br>
+Enemy Bottom Right: 165x (rrand(20,50)) D/T e
 
 ----------------------------------------------------------------------------------
 
